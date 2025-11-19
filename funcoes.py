@@ -1,15 +1,17 @@
-import math
+import matplotlib
+matplotlib.use('TkAgg') # Tenta forçar o uso do backend Tkinter
+# Se o TkAgg não funcionar, tente 'Qt5Agg' ou 'Agg' (este último não abre janela, mas salva)
 
+import math
+import numpy as np
+import matplotlib.pyplot as plt
+# ... restante do seu código ...
 # Fórmula simbólica da equação do segundo grau (apenas para exibir)
 FormulaPadrao = "f(x) = a*x**2 + b*x + c"
 
 sen30 = 0.5
 cos30 = math.sqrt(3) / 2
 tg30 = sen30 / cos30
-
-print(sen30)
-print(cos30)
-print(tg30)
 
 
 def calcular_delta(a, b, c):
@@ -20,25 +22,19 @@ def calcular_delta(a, b, c):
 def calcular_raizes(a, b, c):
     """Calcula as duas raízes reais da equação do segundo grau (se existirem)."""
     if a == 0:
-        print("❌ O valor de 'a' não pode ser zero em uma equação do segundo grau.")
         return None, None
 
     delta = calcular_delta(a, b, c)
-    print(f"Δ = {delta}")
 
     if delta < 0:
-        print('''\nSe o delta (Δ) for negativo:
-        Dentro da fórmula há √Δ → não existe raiz quadrada real de número negativo.
-        Isso quer dizer que não há interseção com o eixo X, ou seja, nenhuma raiz real.\n''')
+        # Retorna None, None para indicar que não há raízes reais
         return None, None
 
     raiz_delta = math.sqrt(delta)
     x1 = (-b + raiz_delta) / (2 * a)
     x2 = (-b - raiz_delta) / (2 * a)
 
-    print(f"x1 = {x1}")
-    print(f"x2 = {x2}")
-
+    # Apenas retorna os valores
     return x1, x2
 
 
@@ -50,7 +46,6 @@ def derivada(a, b):
 def vertice(a, b, c):
     """Calcula o vértice e identifica se é ponto máximo ou mínimo."""
     if a == 0:
-        print("❌ O valor de 'a' não pode ser zero em uma equação do segundo grau.")
         return None, None, None
 
     xv = -b / (2 * a)
@@ -58,28 +53,60 @@ def vertice(a, b, c):
 
     tipo = "ponto mínimo" if a > 0 else "ponto máximo"
 
-    print(f"xv = {xv}")
-    print(f"yv = {yv}")
-    print(f"Esse é um {tipo}.")
-
+    # Apenas retorna os valores e o tipo
     return xv, yv, tipo
-def plotar_grafico(a, b, c):
-    """Plota o gráfico da função quadrática."""
-    import matplotlib.pyplot as plt
-    import numpy as np
 
-    # Gera valores de x
-    x = np.linspace(-10, 10, 400)
-    # Calcula os valores correspondentes de y
+
+def plotar_grafico(a, b, c, x1=None, x2=None, xv=None, yv=None):
+    """
+    Plota o gráfico da função quadrática, incluindo as raízes (x1, x2) e o vértice (xv, yv).
+    """
+    
+    # 1. AJUSTE DINÂMICO DO EIXO X PARA GARANTIR VISIBILIDADE
+    min_x = -5
+    max_x = 5
+    if xv is not None:
+        min_x = min(min_x, xv - 3)
+        max_x = max(max_x, xv + 3)
+    if x1 is not None:
+        min_x = min(min_x, x1 - 1)
+        max_x = max(max_x, x1 + 1)
+    if x2 is not None:
+        min_x = min(min_x, x2 - 1)
+        max_x = max(max_x, x2 + 1)
+        
+    x = np.linspace(min_x - 1, max_x + 1, 400)
     y = a * x**2 + b * x + c
 
-    plt.figure(figsize=(8, 6))
-    plt.plot(x, y, label=f'f(x) = {a}x² + {b}x + {c}')
+    # 2. CONFIGURAÇÃO BÁSICA DO GRÁFICO
+    plt.figure(figsize=(9, 6)) 
+    
+    plt.plot(x, y, label=f'f(x) = {a}x² + {b}x + {c}', color='blue') 
+
+    # Linhas de Referência (Eixos)
+    plt.axhline(0, color='black', linewidth=0.8, linestyle='--')
+    plt.axvline(0, color='black', linewidth=0.8, linestyle='--')
+    plt.grid(color='gray', linestyle=':', linewidth=0.5, alpha=0.6)
     plt.title('Gráfico da Função Quadrática')
     plt.xlabel('x')
     plt.ylabel('f(x)')
-    plt.axhline(0, color='black',linewidth=0.5, ls='--')
-    plt.axvline(0, color='black',linewidth=0.5, ls='--')
-    plt.grid(color = 'gray', linestyle = '--', linewidth = 0.5)
+
+    # 3. PLOTAGEM DO VÉRTICE
+    if xv is not None and yv is not None:
+        tipo = "Mínimo" if a > 0 else "Máximo"
+        cor_v = 'darkorange' if a > 0 else 'purple'
+        
+        plt.plot(xv, yv, 's', color=cor_v, markersize=8, label=f'Vértice ({tipo}) ({xv:.4f}, {yv:.4f})')
+        plt.axvline(xv, color=cor_v, linestyle=':', linewidth=0.7)
+        plt.axhline(yv, color=cor_v, linestyle=':', linewidth=0.7)
+        
+    # 4. PLOTAGEM DAS RAÍZES
+    if x1 is not None:
+        plt.plot(x1, 0, 'ro', markersize=7, label=f'Raiz x1 ({x1:.4f}, 0)')
+        
+        if x2 is not None and abs(x1 - x2) > 1e-4: # Usa tolerância para evitar duplicar raízes muito próximas
+            plt.plot(x2, 0, 'go', markersize=7, label=f'Raiz x2 ({x2:.4f}, 0)')
+
+    # 5. FINALIZAÇÃO
     plt.legend()
     plt.show()

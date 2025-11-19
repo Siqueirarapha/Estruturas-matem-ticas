@@ -1,5 +1,6 @@
 import os
 import funcoes
+import math # Adicionado para garantir o math.sqrt caso alguma função precise
 
 os.system('cls')
 
@@ -25,18 +26,34 @@ while True:
         x1, x2 = funcoes.calcular_raizes(a, b, c)
         xv, yv, tipo = funcoes.vertice(a, b, c)
 
-        # Exibição de resultados
-        print(f"\nΔ (Delta) = {delta}")
-        print(f"Raízes: x1 = {x1}, x2 = {x2}")
-        print(f"Vértice: ({xv}, {yv}) → {tipo}")
+        # -----------------------------------------------------------------
+        # Exibição de resultados (AGORA CENTRALIZADA E FORMATADA)
+        # -----------------------------------------------------------------
+        print("\n--- Resultados ---\n")
+        print(f"Δ (Delta) = {delta:.4f}")
+        
+        # Exibe Raízes de forma condicional
+        if x1 is not None:
+            # Garante que x1 e x2 sejam exibidos apenas com 4 casas decimais
+            print(f"Raízes: x1 = {x1:.4f}, x2 = {x2:.4f}")
+        else:
+            print("Raízes: Não existem raízes reais (Δ < 0).")
+            
+        # Exibe Vértice
+        if xv is not None:
+            # Exibe o vértice e o tipo (máximo ou mínimo)
+            print(f"Vértice: ({xv:.4f}, {yv:.4f}) → {tipo}")
+        
         print(f"Derivada: {funcoes.derivada(a, b)}")
 
-        # Exibe gráfico (caso tenha a função em funcoes.py)
+        # Exibe gráfico
         if hasattr(funcoes, "plotar_grafico"):
-            funcoes.plotar_grafico(a, b, c)
+            funcoes.plotar_grafico(a, b, c, x1=x1, x2=x2, xv=xv, yv=yv)
 
-        input("\nAperte ENTER para continuar ou feche o programa para sair...")
-        os.system('cls')
+            input("\nAperte ENTER para continuar ou feche o programa para sair...")
+            os.system('cls')
+            
+        break # Sai do loop após o processamento bem-sucedido
 
     except ValueError:
         print("⚠️ Por favor, insira apenas números válidos.")
